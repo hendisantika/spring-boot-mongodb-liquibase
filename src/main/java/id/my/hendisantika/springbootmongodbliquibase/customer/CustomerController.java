@@ -2,8 +2,11 @@ package id.my.hendisantika.springbootmongodbliquibase.customer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,4 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+
+    @GetMapping
+    public List<Customer> getAll() {
+        log.info("Get All customer");
+        return customerService.getAll();
+    }
 }
