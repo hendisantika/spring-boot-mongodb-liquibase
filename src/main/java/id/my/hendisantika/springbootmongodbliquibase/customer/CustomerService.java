@@ -3,6 +3,9 @@ package id.my.hendisantika.springbootmongodbliquibase.customer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * Project : spring-boot-mongodb-liquibase
@@ -17,4 +20,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+
+    public List<Customer> saveAll(String... names) {
+        return Arrays.asList(names).stream()
+                .map(Customer::new)
+                .map(customerRepository::save)
+                .toList();
+    }
 }
