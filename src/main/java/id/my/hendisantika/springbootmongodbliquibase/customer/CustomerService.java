@@ -27,4 +27,8 @@ public class CustomerService {
                 .map(customerRepository::save)
                 .toList();
     }
+
+    public List<Customer> getAll() {
+        return customerRepository.findAll();
+    }
 }
