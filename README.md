@@ -1,14 +1,72 @@
 # spring-boot-mongodb-liquibase
 
-### Things todo list
+[![Java CI with Gradle](https://github.com/hendisantika/spring-boot-mongodb-liquibase/actions/workflows/gradle.yml/badge.svg)](https://github.com/hendisantika/spring-boot-mongodb-liquibase/actions/workflows/gradle.yml)
+![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot)
+![Gradle](https://img.shields.io/badge/Gradle-9.8.2-02303A?logo=gradle)
+![MongoDB](https://img.shields.io/badge/MongoDB-8.0.4-47A248?logo=mongodb)
+![Liquibase](https://img.shields.io/badge/Liquibase-5.0.4-2962FF?logo=liquibase)
+
+Sample Spring Boot application that manages MongoDB schema and seed data with
+[Liquibase MongoDB extension](https://github.com/liquibase/liquibase-mongodb) JSON changelogs.
+
+## Tech Stack
+
+| Component          | Version |
+|--------------------|---------|
+| Java (toolchain)   | 25      |
+| Spring Boot        | 4.1.1   |
+| Gradle (wrapper)   | 9.8.2   |
+| Liquibase MongoDB  | 5.0.4   |
+| MongoDB            | 8.0.4   |
+| Testcontainers     | 2.0.5   |
+
+## Prerequisites
+
+- JDK 25 (e.g. [Eclipse Temurin](https://adoptium.net/))
+- Docker (used by Spring Boot Docker Compose support and Testcontainers)
+
+## Things todo list
 
 1. Clone this repository: `git clone https://github.com/hendisantika/spring-boot-mongodb-liquibase.git`
 2. Navigate to the folder: `cd spring-boot-mongodb-liquibase`
 3. Make sure your Docker is UP and Running.
-4. Run the application: `mvn clean spring-boot:run`
+4. Run the application: `./gradlew bootRun`
+   (MongoDB from `compose.yaml` is started automatically by `spring-boot-docker-compose`)
 5. Open your favorite browser: http://localhost:8080/api/customers
-6. Check your console log:
 
+## API
+
+| Method | Endpoint         | Description        |
+|--------|------------------|--------------------|
+| GET    | `/api/customers` | List all customers |
+
+## Liquibase Changelogs
+
+Changelogs live in `src/main/resources/db-json`:
+
+- `master.json` – root changelog that includes the files below
+- `00_initial-structure.json` – drops & creates the `customers` collection
+- `01_initial-data.json` – seeds 14 customers
+
+## Running Tests
+
+```shell
+./gradlew build
+```
+
+`SpringBootMongodbLiquibaseApplicationTests` starts a MongoDB 8 container via Testcontainers, runs the
+Liquibase changelog and verifies the seeded customers. Docker must be available locally.
+
+## CI/CD
+
+- **GitHub Actions** (`.github/workflows/gradle.yml`): builds and tests on JDK 25 (Temurin) for every push and PR to `main`,
+  and submits the dependency graph on push. Testcontainers Cloud is used only when the `TC_CLOUD_TOKEN` secret is set;
+  otherwise tests run on the runner's Docker.
+- **Dependabot** (`.github/dependabot.yml`): daily Gradle updates (grouped for Spring, Liquibase, Testcontainers and
+  minor/patch bumps), weekly grouped GitHub Actions updates and weekly Docker Compose (MongoDB image) updates.
+
+## Sample Console Log
 ```shell
 
   .   ____          _            __ _ _
@@ -133,7 +191,7 @@ Liquibase: Update has been successful.
 
 ```
 
-### List All Customers
+## Sample Response — List All Customers
 
 ```json
 // 20250118062622
