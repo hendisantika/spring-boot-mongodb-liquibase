@@ -61,8 +61,7 @@ Liquibase changelog and verifies the seeded customers. Docker must be available 
 ## CI/CD
 
 - **GitHub Actions** (`.github/workflows/gradle.yml`): builds and tests on JDK 25 (Temurin) for every push and PR to `main`,
-  and submits the dependency graph on push. Testcontainers Cloud is used only when the `TC_CLOUD_TOKEN` secret is set;
-  otherwise tests run on the runner's Docker.
+  and submits the dependency graph on push. Testcontainers runs against the runner's built-in Docker daemon.
 - **Dependabot** (`.github/dependabot.yml`): daily Gradle updates (grouped for Spring, Liquibase, Testcontainers and
   minor/patch bumps), weekly grouped GitHub Actions updates and weekly Docker Compose (MongoDB image) updates.
 

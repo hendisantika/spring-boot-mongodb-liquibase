@@ -25,8 +25,6 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
-    env:
-      TC_CLOUD_TOKEN: ${{ secrets.TC_CLOUD_TOKEN }}
 
     steps:
     - uses: actions/checkout@v7
@@ -36,13 +34,7 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
 
-    # Optional: use Testcontainers Cloud when the token is available.
-    # Otherwise (e.g. Dependabot or fork PRs) tests use the runner's local Docker.
-    - name: Setup Testcontainers Cloud Client
-      if: env.TC_CLOUD_TOKEN != ''
-      uses: atomicjar/testcontainers-cloud-setup-action@v1
-      with:
-        token: ${{ env.TC_CLOUD_TOKEN }}
+    # Testcontainers uses the Docker daemon pre-installed on GitHub-hosted Ubuntu runners.
 
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
