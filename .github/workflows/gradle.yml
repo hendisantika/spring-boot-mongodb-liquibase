@@ -12,13 +12,21 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
+    env:
+      TC_CLOUD_TOKEN: ${{ secrets.TC_CLOUD_TOKEN }}
 
     steps:
     - uses: actions/checkout@v7
@@ -28,10 +36,13 @@ jobs:
         java-version: '25'
         distribution: 'temurin'
 
+    # Optional: use Testcontainers Cloud when the token is available.
+    # Otherwise (e.g. Dependabot or fork PRs) tests use the runner's local Docker.
     - name: Setup Testcontainers Cloud Client
+      if: env.TC_CLOUD_TOKEN != ''
       uses: atomicjar/testcontainers-cloud-setup-action@v1
       with:
-        token: ${{ secrets.TC_CLOUD_TOKEN }}
+        token: ${{ env.TC_CLOUD_TOKEN }}
 
       # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
@@ -41,20 +52,18 @@ jobs:
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
-    # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
-    # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
-    #
-    # - name: Setup Gradle
-    #   uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
-    #   with:
-    #     gradle-version: '8.9'
-    #
-    # - name: Build with Gradle 8.9
-    #   run: gradle build
+    - name: Upload test reports
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-reports
+        path: build/reports/tests/
+        retention-days: 7
 
   dependency-submission:
 
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     permissions:
       contents: write
 
